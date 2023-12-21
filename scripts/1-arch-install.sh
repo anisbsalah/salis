@@ -257,8 +257,12 @@ echo "
 ==============================================================================
 "
 # Set up swapfile
-RAM_SIZE=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-btrfs filesystem mkswapfile --size "${RAM_SIZE}k" --uuid clear /mnt/swap/swapfile
+ram=$(free -m -t | awk 'NR == 2 {print $2}')
+result=$((ram < 4096 ? ram : 4096))
+result=$((result + ((ram - 4096 > 0 ? ram - 4096 : 0) / 2)))
+result=$((result < 32 * 1024 ? result : 32 * 1024))
+SWAPFILE_SIZE="${result}"
+btrfs filesystem mkswapfile --size "${SWAPFILE_SIZE}M" --uuid clear /mnt/swap/swapfile
 swapon /mnt/swap/swapfile
 echo '/swap/swapfile none swap defaults 0 0' >>/mnt/etc/fstab
 
