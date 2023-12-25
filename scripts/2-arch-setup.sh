@@ -30,7 +30,7 @@ hwclock --systohc
 
 echo "
 ==============================================================================
- Setup Language to US and set locale
+ Setup Language to US and set Locale
 ==============================================================================
 "
 # Uncomment the desired locale in /etc/locale.gen
@@ -61,7 +61,7 @@ echo "${HOSTNAME}" >/etc/hostname
 # Configure network
 {
 	echo '127.0.0.1 localhost'
-	echo '::1 		localhost'
+	echo '::1 		 localhost'
 	echo "127.0.1.1 ${HOSTNAME}.localdomain ${HOSTNAME}"
 } >>/etc/hosts
 
@@ -72,7 +72,7 @@ echo "
 "
 # Complete the network configuration for the newly installed environment
 pacman -S --noconfirm --needed networkmanager
-systemctl enable NetworkManager
+systemctl enable NetworkManager.service
 
 echo "
 ==============================================================================
@@ -187,6 +187,24 @@ if grep -E "Broadcom" <<<"${WIRELESS_CARD}"; then
 		pacman -S --noconfirm --needed dkms broadcom-wl-dkms
 	fi
 fi
+
+echo "
+==============================================================================
+ Xorg/Keyboard configuration
+==============================================================================
+"
+echo "  Set X11 keymap to: $KEYMAP"
+mkdir -p /etc/X11/xorg.conf.d
+cat >>"/etc/X11/xorg.conf.d/00-keyboard.conf" <<EOF
+# Written by systemd-localed(8), read by systemd-localed and Xorg. It's
+# probably wise not to edit this file manually. Use localectl(1) to
+# update this file.
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "$KEYMAP"
+EndSection
+EOF
 
 echo "
 ==============================================================================
