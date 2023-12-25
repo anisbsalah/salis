@@ -158,7 +158,7 @@ echo "
 ==============================================================================
 "
 # Display server
-pacman -S --noconfirm --needed xorg xorg-apps xorg-server xorg-xhost xorg-xinit xorg-xkill xorg-xwayland
+pacman -S --noconfirm --needed xorg xorg-apps xorg-xinit
 
 echo "
 ==============================================================================
@@ -178,7 +178,7 @@ elif grep -E "Intel Corporation UHD" <<<"${GPU_TYPE}"; then
 fi
 
 # Input drivers
-pacman -S --noconfirm --needed xf86-input-synaptics xf86-input-libinput xf86-input-evdev xf86-input-elographics
+pacman -S --noconfirm --needed libinput xf86-input-libinput xf86-input-evdev xf86-input-elographics xf86-input-synaptics
 
 # Install necessary drivers for wireless card
 WIRELESS_CARD=$(lspci -v | grep -i network)
