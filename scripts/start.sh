@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Checking if running in Repo Folder
+# Checking if running in repo folder
 if [[ "$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]')" =~ ^scripts$ ]]; then
-	echo "You are running this in 'salis' Folder."
+	echo "You are running this in 'salis' folder."
 	echo "Please use ./salis.sh instead!"
 	exit
 fi
@@ -11,11 +11,11 @@ fi
 echo "[*] Installing git..."
 pacman -Sy --noconfirm --needed git
 
-# Cloning Project
-echo "[*] Cloning 'salis' Project..."
+# Cloning project
+echo "[*] Cloning 'salis' project..."
 git clone https://github.com/anisbsalah/salis.git
 
-# Executing Script
-echo "[*] Executing 'salis.sh' Script..."
+# Executing script
+echo "[*] Executing 'salis.sh' script..."
 cd "${HOME}/salis" || exit 1
 exec ./salis.sh

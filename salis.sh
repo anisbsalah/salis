@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # @file Salis
 
@@ -14,7 +14,6 @@ setfont ter-v18b
 timedatectl set-ntp true
 
 clear
-
 echo "
 ==============================================================================
    █████╗ ██████╗  ██████╗██╗  ██╗    ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
@@ -28,6 +27,7 @@ echo "
 ==============================================================================
 "
 sleep 1
+clear
 (bash "${PROJECT_DIR}/scripts/1-arch-install.sh") |& tee 1-arch-install.log
 source "${PROJECT_DIR}/setup.conf"
 (arch-chroot /mnt "${HOME}/salis/scripts/2-arch-setup.sh") |& tee 2-arch-setup.log
@@ -44,7 +44,7 @@ echo "
 ==============================================================================
             Automated Script For A Minimal Arch Linux Installation
 ==============================================================================
-                 Done - Please Eject Install Media and Reboot
+                 Done - please eject install media and reboot
 ==============================================================================
                   Type 'exit', 'umount -R /mnt' and 'reboot'
 ==============================================================================

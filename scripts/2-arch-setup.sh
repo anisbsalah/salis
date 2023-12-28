@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "
 ==============================================================================
@@ -58,7 +58,7 @@ echo "
 # Set the hostname
 echo "${HOSTNAME}" >/etc/hostname
 
-# Configure network
+# Local network hostname resolution
 {
 	echo '127.0.0.1 localhost'
 	echo '::1 		 localhost'
@@ -99,7 +99,7 @@ echo "
 ==============================================================================
 "
 # Install boot loader
-echo "[*] Installing GRUB Boot loader..."
+echo "[*] Installing GRUB boot loader..."
 if [[ ! -d "/sys/firmware/efi" ]]; then
 	pacman -S --noconfirm --needed grub dosfstools mtools os-prober
 	grub-install --target=i386-pc "${DISK}"
@@ -130,14 +130,14 @@ echo "'salis' copied to home directory"
 
 echo "
 ==============================================================================
- Pacman configuration
+ 'pacman' configuration
 ==============================================================================
 "
 # Configure pacman
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-echo "[*] Updating Database..."
+echo "[*] Updating database..."
 pacman -Sy
 
 echo "
@@ -160,7 +160,7 @@ echo "
  Display server
 ==============================================================================
 "
-# Install Display server
+# Install Xorg display server
 echo "[*] Installing Xorg..."
 pacman -S --noconfirm --needed xorg xorg-apps xorg-xinit
 
@@ -169,8 +169,8 @@ echo "
  Drivers
 ==============================================================================
 "
-# Install Graphics drivers
-echo "[*] Installing Graphics drivers..."
+# Install graphics card drivers
+echo "[*] Installing graphics card drivers..."
 GPU_TYPE=$(lspci -v | grep -A1 -e VGA -e 3D)
 if grep -E "NVIDIA|GeForce" <<<"${GPU_TYPE}"; then
 	pacman -S --noconfirm --needed xf86-video-nouveau mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader
@@ -182,15 +182,15 @@ elif grep -E "Intel Corporation UHD" <<<"${GPU_TYPE}"; then
 	pacman -S --noconfirm --needed xf86-video-intel mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader vulkan-intel lib32-vulkan-intel libvdpau-va-gl libva-intel-driver libva-utils
 fi
 
-# Install Input drivers
-echo "[*] Installing Input drivers..."
+# Install input drivers
+echo "[*] Installing input drivers..."
 pacman -S --noconfirm --needed libinput xf86-input-libinput xf86-input-evdev xf86-input-elographics xf86-input-synaptics
 
 # Install necessary drivers for wireless card
 WIRELESS_CARD=$(lspci -v | grep -i network)
 if grep -E "Broadcom" <<<"${WIRELESS_CARD}"; then
 	if grep -E "BCM43" <<<"${WIRELESS_CARD}"; then
-		echo "[*] Installing Wireless Card drivers..."
+		echo "[*] Installing wireless card drivers..."
 		pacman -S --noconfirm --needed dkms broadcom-wl-dkms
 	fi
 fi

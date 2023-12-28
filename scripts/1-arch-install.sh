@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BOLD=$(tput bold)
 RESET=$(tput sgr0)
@@ -73,7 +73,7 @@ echo "
 "
 # Set the disk device you want to install Arch Linux on
 tput setaf 2
-read -erp "${BOLD}[*] Set the disk device you want to install Arch Linux on (e.g. /dev/sda): ${RESET}" DISK
+read -erp "${BOLD}[*] Set the disk device you want to install Arch Linux on: ${RESET}" DISK
 set_option DISK "${DISK}"
 
 # Print the disk information
@@ -211,7 +211,8 @@ echo "
 # Installing Prerequisites
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
-pacman -Sy --noconfirm archlinux-keyring # Update keyrings to latest to prevent packages failing to install
+pacman -Sy
+pacman -S --noconfirm archlinux-keyring # Update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed arch-install-scripts
 pacman -S --noconfirm --needed curl reflector rsync
 
