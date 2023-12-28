@@ -254,10 +254,10 @@ cat /mnt/etc/fstab
 
 echo "
 ==============================================================================
- Swapfile setup
+ Swap file creation
 ==============================================================================
 "
-# Set up swapfile
+# Create swap file
 ram=$(free -m -t | awk 'NR == 2 {print $2}')
 result=$((ram < 4096 ? ram : 4096))
 result=$((result + ((ram - 4096 > 0 ? ram - 4096 : 0) / 2)))
