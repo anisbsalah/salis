@@ -133,7 +133,7 @@ echo "
  'pacman' configuration
 ==============================================================================
 "
-# Configure pacman
+# Configure 'pacman'
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
