@@ -68,7 +68,7 @@ lsblk
 
 echo "
 ==============================================================================
- Setting the Disk to install Arch Linux on
+ Setting the disk to install Arch Linux on
 ==============================================================================
 "
 # Set the disk device you want to install Arch Linux on
@@ -87,7 +87,7 @@ clear
 
 echo "
 ==============================================================================
- Wiping DATA on ${DISK} & Creating a new GPT Table
+ Wiping DATA on ${DISK} & Creating a new GPT table
 ==============================================================================
 "
 # Confirm the data wipe
@@ -108,7 +108,7 @@ sgdisk --set-alignment=2048 --clear "${DISK}"
 
 echo "
 ==============================================================================
- Partitioning Disk & Formatting Partitions
+ Partitioning the disk & Formatting the partitions
 ==============================================================================
 "
 bios_gpt_auto_partitions() {
@@ -142,8 +142,8 @@ create_subvolumes() {
 	echo "Creating subvolumes for root, home, .snapshots, swap, tmp and var/log directories..."
 	btrfs subvolume create /mnt/@
 	btrfs subvolume create /mnt/@home
-	btrfs subvolume create /mnt/@swap
 	btrfs subvolume create /mnt/@snapshots
+	btrfs subvolume create /mnt/@swap
 	btrfs subvolume create /mnt/@tmp
 	btrfs subvolume create /mnt/@var_log
 }
@@ -160,24 +160,25 @@ mount_subvolumes() {
 	mount -o noatime,compress=zstd,commit=120,subvol=@var_log "${ROOT_PARTITION}" /mnt/var/log
 }
 
+# Set up btrfs subvolumes
 subvolumes_setup() {
 	create_subvolumes
 	umount /mnt
 	mount_subvolumes
 }
 
-# Mount the EFI system partition
+# Mount the EFI System partition
 mount_efi_partition() {
-	echo "Mounting the EFI system partition..."
+	echo "Mounting the EFI System partition..."
 	mount --mkdir "${EFI_PARTITION}" /mnt/boot
 }
 
 # Partition the disk, format and mount the partitions
 if [[ -d "/sys/firmware/efi" ]]; then
-	# Auto partitioning
+	# Auto partitioning (UEFI/GPT layout)
 	uefi_gpt_auto_partitions
-	# Format the EFI system partition as FAT32
-	echo "Formatting the EFI system partition as FAT32..."
+	# Format the EFI System partition as FAT32
+	echo "Formatting the EFI System partition as FAT32..."
 	mkfs.fat -F 32 "${EFI_PARTITION}"
 	# Format the root partition as Btrfs
 	echo "Formatting the root partition as Btrfs..."
@@ -187,10 +188,10 @@ if [[ -d "/sys/firmware/efi" ]]; then
 	mount "${ROOT_PARTITION}" /mnt
 	# Subvolumes setup
 	subvolumes_setup
-	# Mount the EFI system partition
+	# Mount the EFI System partition
 	mount_efi_partition
 else
-	# Auto partitioning
+	# Auto partitioning (BIOS/GPT layout)
 	bios_gpt_auto_partitions
 	# Format the root partition as Btrfs
 	echo "Formatting the root partition as Btrfs..."
@@ -204,7 +205,7 @@ fi
 
 echo "
 ==============================================================================
- Installing Prerequisites
+ Installing prerequisites
 ==============================================================================
 "
 # Installing Prerequisites
@@ -217,7 +218,7 @@ pacman -S --noconfirm --needed curl reflector rsync
 country_iso=$(curl -4 ifconfig.co/country-iso)
 echo "
 ==============================================================================
- Setting up ${country_iso} Mirrors for faster downloads
+ Setting up ${country_iso} mirrors for faster downloads
 ==============================================================================
 "
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -227,14 +228,14 @@ reflector -a 48 -c "${country_iso}" -f 5 -l 20 --sort rate --save /etc/pacman.d/
 
 echo "
 ==============================================================================
- Installing Base System
+ Installing essential packages
 ==============================================================================
 "
 base_pkgs=("base" "base-devel")
 kernel_pkgs=("linux" "linux-headers" "linux-docs")
 firmware_pkgs=("linux-firmware")
 doc_pkgs=("man-db" "man-pages" "texinfo")
-extra_pkgs=("bash-completion" "btrfs-progs" "nano" "sudo" "terminus-font")
+extra_pkgs=("bash-completion" "btrfs-progs" "nano" "sudo" "terminus-font" "zstd")
 
 # Install the base system
 pacstrap -K /mnt "${base_pkgs[@]}" "${kernel_pkgs[@]}" "${firmware_pkgs[@]}" "${doc_pkgs[@]}" "${extra_pkgs[@]}"
@@ -253,7 +254,7 @@ cat /mnt/etc/fstab
 
 echo "
 ==============================================================================
- Setup Swapfile
+ Swapfile setup
 ==============================================================================
 "
 # Set up swapfile
@@ -264,7 +265,8 @@ result=$((result < 32 * 1024 ? result : 32 * 1024))
 SWAPFILE_SIZE="${result}"
 btrfs filesystem mkswapfile --size "${SWAPFILE_SIZE}M" --uuid clear /mnt/swap/swapfile
 swapon /mnt/swap/swapfile
-echo '/swap/swapfile none swap defaults 0 0' >>/mnt/etc/fstab
+echo '# Swap
+/swap/swapfile none swap defaults 0 0' >>/mnt/etc/fstab
 
 # Copy 'salis' directory to the new system
 cp -R "${PROJECT_DIR}" /mnt/root/salis
@@ -278,3 +280,4 @@ echo "
 "
 sleep 1
 clear
+exit 0

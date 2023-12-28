@@ -21,7 +21,7 @@ source "${HOME}/salis/setup.conf"
 
 echo "
 ==============================================================================
- Setup Timezone
+ Timezone
 ==============================================================================
 "
 # Set the time zone
@@ -30,7 +30,7 @@ hwclock --systohc
 
 echo "
 ==============================================================================
- Setup Language to US and set Locale
+ Localization
 ==============================================================================
 "
 # Uncomment the desired locale in /etc/locale.gen
@@ -45,7 +45,7 @@ locale-gen
 	echo 'LC_TIME=C'
 } >>/etc/locale.conf
 
-# Set the console keymap
+# Set the console keyboard layout
 echo "KEYMAP=${KEYBOARD_LAYOUT}" >>/etc/vconsole.conf
 # Set the console font
 echo 'FONT=ter-v18b' >>/etc/vconsole.conf
@@ -67,7 +67,7 @@ echo "${HOSTNAME}" >/etc/hostname
 
 echo "
 ==============================================================================
- Network Setup
+ Network configuration
 ==============================================================================
 "
 # Complete the network configuration for the newly installed environment
@@ -95,10 +95,11 @@ echo "root:${ROOT_PASSWORD}" | chpasswd
 
 echo "
 ==============================================================================
- Installing bootloader
+ Boot loader
 ==============================================================================
 "
-# Install bootloader
+# Install boot loader
+echo "[*] Installing GRUB Boot loader..."
 if [[ ! -d "/sys/firmware/efi" ]]; then
 	pacman -S --noconfirm --needed grub dosfstools mtools os-prober
 	grub-install --target=i386-pc "${DISK}"
@@ -111,7 +112,7 @@ fi
 
 echo "
 ==============================================================================
- Adding user
+ User management
 ==============================================================================
 "
 # Add user
@@ -122,50 +123,54 @@ echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 # Add sudo rights to group wheel
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
+# Copy project to user home directory
 cp -R "${HOME}/salis" "/home/${USERNAME}/"
 chown -R "${USERNAME}": "/home/${USERNAME}/salis"
 echo "'salis' copied to home directory"
 
 echo "
 ==============================================================================
- Configure pacman
+ Pacman configuration
 ==============================================================================
 "
 # Configure pacman
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-pacman -Sy --noconfirm --needed
+echo "[*] Updating Database..."
+pacman -Sy
 
 echo "
 ==============================================================================
- Installing Microcode
+ Microcode
 ==============================================================================
 "
 # Determine processor type and install microcode
 PROC_TYPE=$(lscpu)
 if grep -E "GenuineIntel" <<<"${PROC_TYPE}"; then
-	echo "Installing Intel microcode"
+	echo "[*] Installing Intel microcode..."
 	pacman -S --noconfirm --needed intel-ucode
 elif grep -E "AuthenticAMD" <<<"${PROC_TYPE}"; then
-	echo "Installing AMD microcode"
+	echo "[*] Installing AMD microcode..."
 	pacman -S --noconfirm --needed amd-ucode
 fi
 
 echo "
 ==============================================================================
- Installing Display server
+ Display server
 ==============================================================================
 "
-# Display server
+# Install Display server
+echo "[*] Installing Xorg..."
 pacman -S --noconfirm --needed xorg xorg-apps xorg-xinit
 
 echo "
 ==============================================================================
- Installing drivers
+ Drivers
 ==============================================================================
 "
-# Graphics Drivers
+# Install Graphics drivers
+echo "[*] Installing Graphics drivers..."
 GPU_TYPE=$(lspci -v | grep -A1 -e VGA -e 3D)
 if grep -E "NVIDIA|GeForce" <<<"${GPU_TYPE}"; then
 	pacman -S --noconfirm --needed xf86-video-nouveau mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader
@@ -177,13 +182,15 @@ elif grep -E "Intel Corporation UHD" <<<"${GPU_TYPE}"; then
 	pacman -S --noconfirm --needed xf86-video-intel mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader vulkan-intel lib32-vulkan-intel libvdpau-va-gl libva-intel-driver libva-utils
 fi
 
-# Input drivers
+# Install Input drivers
+echo "[*] Installing Input drivers..."
 pacman -S --noconfirm --needed libinput xf86-input-libinput xf86-input-evdev xf86-input-elographics xf86-input-synaptics
 
 # Install necessary drivers for wireless card
 WIRELESS_CARD=$(lspci -v | grep -i network)
 if grep -E "Broadcom" <<<"${WIRELESS_CARD}"; then
 	if grep -E "BCM43" <<<"${WIRELESS_CARD}"; then
+		echo "[*] Installing Wireless Card drivers..."
 		pacman -S --noconfirm --needed dkms broadcom-wl-dkms
 	fi
 fi
@@ -193,7 +200,7 @@ echo "
  Xorg/Keyboard configuration
 ==============================================================================
 "
-echo "  Set X11 keymap to: $KEYMAP"
+echo "  Set X11 keymap to: ${KEYBOARD_LAYOUT}"
 mkdir -p /etc/X11/xorg.conf.d
 cat >>"/etc/X11/xorg.conf.d/00-keyboard.conf" <<EOF
 # Written by systemd-localed(8), read by systemd-localed and Xorg. It's
@@ -202,7 +209,7 @@ cat >>"/etc/X11/xorg.conf.d/00-keyboard.conf" <<EOF
 Section "InputClass"
         Identifier "system-keyboard"
         MatchIsKeyboard "on"
-        Option "XkbLayout" "$KEYMAP"
+        Option "XkbLayout" "${KEYBOARD_LAYOUT}"
 EndSection
 EOF
 
@@ -217,3 +224,4 @@ rm -rv "/home/${USERNAME}/salis"
 echo "
 ==============================================================================
 "
+exit 0
