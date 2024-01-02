@@ -211,7 +211,6 @@ echo "
 # Installing Prerequisites
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
-pacman -Sy
 pacman -S --noconfirm archlinux-keyring # Update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed arch-install-scripts
 pacman -S --noconfirm --needed curl reflector rsync
@@ -225,7 +224,7 @@ echo "
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 
 # Ranking mirrors by country
-reflector -a 48 -c "${country_iso}" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --download-timeout 60 -a 48 -c "${country_iso}" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 
 echo "
 ==============================================================================
@@ -234,7 +233,7 @@ echo "
 "
 base_pkgs=("base" "base-devel")
 kernel_pkgs=("linux" "linux-headers" "linux-docs")
-firmware_pkgs=("linux-firmware")
+firmware_pkgs=("linux-firmware" "sof-firmware")
 doc_pkgs=("man-db" "man-pages" "texinfo")
 extra_pkgs=("bash-completion" "btrfs-progs" "nano" "sudo" "terminus-font" "zstd")
 
@@ -268,6 +267,8 @@ btrfs filesystem mkswapfile --size "${SWAPFILE_SIZE}M" --uuid clear /mnt/swap/sw
 swapon /mnt/swap/swapfile
 echo '# Swap
 /swap/swapfile none swap defaults 0 0' >>/mnt/etc/fstab
+
+# ============================================================================
 
 # Copy 'salis' directory to the new system
 cp -R "${PROJECT_DIR}" /mnt/root/salis
