@@ -200,7 +200,7 @@ echo "
  Xorg/Keyboard configuration
 ==============================================================================
 "
-echo "  Set X11 keymap to: ${KEYBOARD_LAYOUT}"
+echo " > Set X11 keymap to: ${KEYBOARD_LAYOUT}"
 mkdir -p /etc/X11/xorg.conf.d
 cat >>"/etc/X11/xorg.conf.d/00-keyboard.conf" <<EOF
 # Written by systemd-localed(8), read by systemd-localed and Xorg. It's
