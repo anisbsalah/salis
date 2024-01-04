@@ -61,7 +61,7 @@ echo "${HOSTNAME}" >/etc/hostname
 # Local network hostname resolution
 {
 	echo '127.0.0.1 localhost'
-	echo '::1 		 localhost'
+	echo '::1       localhost'
 	echo "127.0.1.1 ${HOSTNAME}.localdomain ${HOSTNAME}"
 } >>/etc/hosts
 
