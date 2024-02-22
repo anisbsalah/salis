@@ -223,7 +223,7 @@ echo "
  Swappiness value setup
 ==============================================================================
 "
-echo "vm.swappiness=10" >/etc/sysctl.d/99-swappiness.conf
+echo "vm.swappiness=10" | tee /etc/sysctl.d/99-swappiness.conf
 
 echo "
 ==============================================================================
