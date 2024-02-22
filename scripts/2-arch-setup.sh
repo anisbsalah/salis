@@ -28,6 +28,8 @@ echo "
 ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 hwclock --systohc
 
+echo "> Timezone set to: ${TIMEZONE}"
+
 echo "
 ==============================================================================
  Localization
@@ -45,10 +47,15 @@ LANG=en_US.UTF-8
 LC_TIME=C
 EOF
 
+echo "
+==============================================================================
+ Console keyboard layout and font
+==============================================================================
+"
 # Set the console keyboard layout
-echo "KEYMAP=${KEYBOARD_LAYOUT}" >/etc/vconsole.conf
+echo "KEYMAP=${KEYBOARD_LAYOUT}" | tee /etc/vconsole.conf
 # Set the console font
-echo 'FONT=ter-v18b' >>/etc/vconsole.conf
+echo 'FONT=ter-v18b' | tee -a /etc/vconsole.conf
 
 echo "
 ==============================================================================
@@ -56,7 +63,7 @@ echo "
 ==============================================================================
 "
 # Set the hostname
-echo "${HOSTNAME}" >/etc/hostname
+echo "${HOSTNAME}" | tee /etc/hostname
 
 # Local network hostname resolution
 {
