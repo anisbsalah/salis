@@ -122,7 +122,7 @@ bios_gpt_auto_partitions() {
 	echo "[*] Creating a BIOS boot partition on ${DISK}..."
 	sgdisk --new=1::+1M --typecode=1:ef02 --change-name=1:"BIOS Boot" "${DISK}"
 	# Create a ROOT partition
-	echo "[*] Creating a root partition with Btrfs filesystem on ${DISK}..."
+	echo "[*] Creating a root partition with btrfs filesystem on ${DISK}..."
 	sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:"ArchLinux Root" "${DISK}"
 	# Notify the kernel about the changes made to the partition table
 	reread_partition_table
@@ -133,11 +133,11 @@ uefi_gpt_auto_partitions() {
 	# Create a BIOS boot partition
 	echo "[*] Creating a BIOS boot partition on ${DISK}..."
 	sgdisk --new=1::+1M --typecode=1:ef02 --change-name=1:"BIOS Boot" "${DISK}"
-	# Create an EFI System partition
-	echo "[*] Creating an EFI System partition on ${DISK}..."
+	# Create an EFI system partition
+	echo "[*] Creating an EFI system partition on ${DISK}..."
 	sgdisk --new=2::+1024M --typecode=2:ef00 --change-name=2:"EFI System Partition" "${DISK}"
 	# Create a ROOT partition
-	echo "[*] Creating a root partition with Btrfs filesystem on ${DISK}..."
+	echo "[*] Creating a root partition with btrfs filesystem on ${DISK}..."
 	sgdisk --new=3::-0 --typecode=3:8300 --change-name=3:"ArchLinux Root" "${DISK}"
 	# Notify the kernel about the changes made to the partition table
 	reread_partition_table
@@ -180,9 +180,9 @@ subvolumes_setup() {
 	mount_subvolumes
 }
 
-# Mount the EFI System partition
+# Mount the EFI system partition
 mount_efi_partition() {
-	echo "[*] Mounting the EFI System partition..."
+	echo "[*] Mounting the EFI system partition..."
 	mount --mkdir "${EFI_PARTITION}" /mnt/boot
 }
 
@@ -190,8 +190,8 @@ mount_efi_partition() {
 if [[ -d "/sys/firmware/efi" ]]; then
 	# Auto partitioning (UEFI/GPT layout)
 	uefi_gpt_auto_partitions
-	# Format the EFI System partition as fat32
-	echo "[*] Formatting the EFI System partition as fat32..."
+	# Format the EFI system partition as fat32
+	echo "[*] Formatting the EFI system partition as fat32..."
 	mkfs.fat -F 32 "${EFI_PARTITION}"
 	# Format the root partition as btrfs
 	echo "[*] Formatting the root partition as btrfs..."
@@ -201,7 +201,7 @@ if [[ -d "/sys/firmware/efi" ]]; then
 	mount "${ROOT_PARTITION}" /mnt
 	# Subvolumes setup
 	subvolumes_setup
-	# Mount the EFI System partition
+	# Mount the EFI system partition
 	mount_efi_partition
 else
 	# Auto partitioning (BIOS/GPT layout)
