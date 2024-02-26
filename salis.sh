@@ -6,7 +6,7 @@ PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 set +a
 
 # Set console font
-setfont ter-v18b
+setfont ter-v20b
 
 # Update system clock
 timedatectl set-ntp true
