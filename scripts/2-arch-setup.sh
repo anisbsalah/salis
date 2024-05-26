@@ -151,18 +151,6 @@ fi
 
 echo "
 ==============================================================================
- Initramfs
-==============================================================================
-"
-# Initramfs
-sed -i 's/^MODULES=()/MODULES=(btrfs)/' /etc/mkinitcpio.conf
-sed -i 's/^BINARIES=()/BINARIES=(setfont)/' /etc/mkinitcpio.conf
-sed -i '/^HOOKS=/s/autodetect\( \|$\)/autodetect microcode\1/g' /etc/mkinitcpio.conf
-sed -i 's/^[#[:space:]]*COMPRESSION="zstd"/COMPRESSION="zstd"/' /etc/mkinitcpio.conf
-mkinitcpio -P
-
-echo "
-==============================================================================
  Display server
 ==============================================================================
 "
@@ -225,6 +213,18 @@ echo "
 ==============================================================================
 "
 echo "vm.swappiness=10" | tee /etc/sysctl.d/99-swappiness.conf
+
+echo "
+==============================================================================
+ Initramfs
+==============================================================================
+"
+# Initramfs
+sed -i 's/^MODULES=()/MODULES=(btrfs)/' /etc/mkinitcpio.conf
+sed -i 's/^BINARIES=()/BINARIES=(setfont)/' /etc/mkinitcpio.conf
+sed -i '/^HOOKS=/s/autodetect\( \|$\)/autodetect microcode\1/g' /etc/mkinitcpio.conf
+sed -i 's/^[#[:space:]]*COMPRESSION="zstd"/COMPRESSION="zstd"/' /etc/mkinitcpio.conf
+mkinitcpio -P
 
 echo "
 ==============================================================================
